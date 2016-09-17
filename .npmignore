@@ -1,5 +1,7 @@
 node_modules/
 config.json
+database.json
 
 examples/sc-crud-mysql/node_modules
 examples/sc-crud-mysql/config.json
+examples/sc-crud-mysql/database.json
