@@ -10,7 +10,7 @@
 # sc-crud-mysql
 Realtime CRUD data management layer/plugin for SocketCluster using MySQL as the database.
 
-No working example exists...
+Somewhat of an example build above in the examples folder.
 
 ## Setup
 
