@@ -1,7 +1,8 @@
 var async = require('async'),
 	mysql = require('mysql'),
 	cache = require('mysql-cache'),
-	Filter = require('./filter')
+	Filter = require('./filter'),
+	bcrypt = require('bcrypt')
 
 var SCCRUDMysql = function(options) {
 	var self = this
@@ -31,6 +32,10 @@ var SCCRUDMysql = function(options) {
 	this.debug = options.debug || false
 	this.worker = options.worker || {}
 	this.cacheEnabled = options.cacheEnabled || false
+	this.encryptPasswords = options.encryptPasswords || true
+	if (options.encryption && typeof encryption == 'function') {
+		this._encrypt = options.encryption
+	} 
 
 	this._init(options)
 }
@@ -134,6 +139,15 @@ SCCRUDMysql.prototype._init_cache = function(respond) {
 
 }
 
+SCCRUDMysql.prototype._encrypt = function(val) {
+	if (!val || typeof val != 'string') { return respond('Value must be a valid string.') }
+	return bcrypt.hashSync(val,bcrypt.genSaltSync(10))
+}
+
+SCCRUDMysql.prototype._verifyEncryption = function(val,hash) {
+	return bcrypt.compareSync(val,hash)
+}
+
 SCCRUDMysql.prototype._isObjectEmpty = function(obj) {
   for(var prop in obj) {
     if (Object.prototype.hasOwnProperty.call(obj, prop)) {
@@ -159,7 +173,7 @@ SCCRUDMysql.prototype.first = function(id,primary_key,table,cb) {
 	var self = this
 	var pool = this._pool
 	if (!primary_key) { primary_key = 'id' }
-	pool.query(`SELECT * FROM ?? WHERE ?? = ?`,[table,primary_key,id],function(err,rows) {
+	pool.query('SELECT * FROM ?? WHERE ?? = ?',[table,primary_key,id],function(err,rows) {
 		if (err) { return cb(err) }
 		if (!rows.length) { return cb(null,{}) }
 		return cb(null,rows[0])
@@ -202,8 +216,17 @@ SCCRUDMysql.prototype.create = function(qry,cb,socket) {
 	var self = this
 	var pool = this._pool
 	if (qry.unique) { return self.unique(qry,cb,socket) }
+
+	if (this.encryptPasswords) {
+		for (var key in qry.post) {
+			if (qry.post.hasOwnProperty(key) && key.toLowerCase() == 'password') {
+				qry.post[key] = self._encrypt(qry.post[key])
+			}
+		}
+	}
+
 	pool.query('INSERT INTO ?? SET ?',[qry.table,qry.post],function(err,rows) {
-		self.first(rows.insertId,qry.unique_by || 'id',function(err2,obj) {
+		self.first(rows.insertId,qry.unique_by || 'id',qry.table,function(err2,obj) {
 			if (err2) { return cb(err2) }
 			return cb(null,obj)
 		})
@@ -267,6 +290,15 @@ SCCRUDMysql.prototype.update = function(qry,cb,socket) {
 		if (err) { return cb(err) }
 		var new_obj = {}
 		var put = qry.put || {}
+
+		if (this.encryptPasswords) {
+			for (var key in put) {
+				if (put.hasOwnProperty(key) && key.toLowerCase() == 'password') {
+					put[key] = self._encrypt(put[key])
+				}
+			}
+		}
+
 		var values = [qry.table]
 		fields.forEach(function(field,index) {
 			if (put.hasOwnProperty(field)) {
@@ -309,6 +341,7 @@ SCCRUDMysql.prototype.update = function(qry,cb,socket) {
 				}
 			})
 		}
+
 		pool.query(query,values,cb)
 	})
 }

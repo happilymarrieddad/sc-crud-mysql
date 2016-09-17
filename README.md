@@ -1,5 +1,11 @@
-# WARNING!!!! This project is NOT COMPLETE!!!!!!
+# This is an alpha build. It probably shouldn't be used in production quite yet.
 ### I could really use some strong testing if anyone has the time. Thanks!
+
+## Changelog
+
+- 0.1.0
+  - Finished intial build. Let me know what you think!
+  - I've added encryption. Check out the options below for more details.
 
 # sc-crud-mysql
 Realtime CRUD data management layer/plugin for SocketCluster using MySQL as the database.
@@ -102,6 +108,20 @@ socket.emit('read',{
 	console.log(users)
 })
 
+socket.emit('delete',{
+	table:'users',
+	delete_from:'users,user_types', // (Optional) - assumes the table if not passed in
+	conditionals:[
+		{
+			field:'id',
+			operator:'=',
+			value:7}
+		}
+	]
+},function(err,new_user) {
+	console.log(new_user)
+})
+
 
 ```
 
@@ -109,7 +129,16 @@ Write client-side models to handle complex operations =). So much win!
 
 ## SC-CRUD-Mysql Options
 
-Not using cache
+All options
+
+```js
+scCrudMysql.attach(worker,{
+	encryptPasswords:true, // (Defaults to true) Ecrypt anything passed into the system with the name password (case insensitive)
+	encryption:function(val) { return (val * 2) } // Defaults to bcrypt
+})
+```
+
+Not using cache for database
 
 ```js
 scCrudMysql.attach(worker,{
@@ -165,3 +194,11 @@ scCrudMysql.attach(worker,{
 })
 
 ```
+
+## License
+
+MIT
+
+## Contributors
+
+- Nick Kotenberg [github profile](https://github.com/happilymarrieddad)

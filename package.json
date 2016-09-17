@@ -23,12 +23,10 @@
   ],
   "author": "Nick Kotenberg",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/happilymarrieddad/sc-crud-mysql/issues"
-  },
   "homepage": "https://github.com/happilymarrieddad/sc-crud-mysql#readme",
   "dependencies": {
     "async": "^2.0.1",
+    "bcrypt": "^0.8.7",
     "lodash": "^4.15.0",
     "mysql": "^2.11.1",
     "mysql-cache": "^0.5.5-b"

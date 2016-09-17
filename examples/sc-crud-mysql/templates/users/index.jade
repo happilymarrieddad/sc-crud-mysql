@@ -1,0 +1,64 @@
+ol.breadcrumb
+	li Users
+	li
+		span.glyphicon.glyphicon-plus-sign
+		a#user-accordian-button.panel-title(data-toggle='collapse',data-parent='#accordian',href='#collapseUser',aria-expanded='true',aria-controls='collapseUser')  Add New User
+	input.no-slash.pull-right.form-control(style="margin-top:-0.15%;width:180px;height:28px;padding-left:5px",placeholder="User Search",v-model='search')
+
+div#collapseUser.panel-collapse.collapse(role='tabpanel',aria-labelledby='headingUser')
+	div.well
+		div.row
+			div.col-md-6
+				form.form.form-horizontal
+					div.form-group
+						label.col-md-4.form-label.text-right First
+						div.col-md-5
+							input.form-control.input-sm(type='text',placeholder='First Name',v-model='first')
+					div.form-group
+						label.col-md-4.form-label.text-right Last
+						div.col-md-5
+							input.form-control.input-sm(type='text',placeholder='Last Name',v-model='last')
+					div.form-group
+						label.col-md-4.form-label.text-right Email
+						div.col-md-5
+							input.form-control.input-sm(type='text',placeholder='Email',v-model='email')
+					div.form-group
+						label.col-md-4.form-label.text-right Password
+						div.col-md-5
+							input.form-control.input-sm(type='password',placeholder='Password',v-model='password')
+					div.form-group
+						label.col-md-4.form-label.text-right Confirm Password
+						div.col-md-5
+							input.form-control.input-sm(type='password',placeholder='Confirm Password',v-model='confirm_password')
+					div.form-group
+						label.col-md-4.control-label
+						div.col-md-5
+							div.col-md-4
+								button.btn.btn-sm.btn-success(@click.prevent='create') Create
+							div.col-md-4.col-md-offset-1
+								button.btn.btn-sm.btn-default(type='reset') Reset
+div.table-responsive
+	table.table.table-striped.table-hover.table-condensed
+		thead
+			tr
+				th Name
+				th Email
+				th
+		tbody(v-show="users.length > 0")
+			tr(v-for="user in users")
+				th
+					a.edit-link(href="#/settings/user/{{ user.id }}") {{ user.name }}
+				td {{ user.first }} {{ user.last }}
+				td {{ user.email }}
+				td.text-right
+					a.btn.btn-xs.btn-warning(href="#/settings/user/{{ user.id }}",type="button",style="margin-right:5px")
+						span.glyphicon.glyphicon-edit
+					button.btn.btn-xs.btn-danger(id="delete-user-{{ user.id }}",type="button",@click="delete(user)")
+						span.glyphicon.glyphicon-trash
+			tr(v-show="pagination")
+				th(colspan="3")
+					pagination(:num='num_users',:limit='25',:total='total_users')
+		tbody(v-show="users.length < 1")
+			tr
+				th.text-center(colspan="3") 
+					b No users

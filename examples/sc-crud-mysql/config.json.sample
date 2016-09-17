@@ -1,0 +1,11 @@
+{
+	"name":"Test APP",
+	"port":3000,
+
+	"db":{
+		"host":"localhost",
+		"user":"",
+		"password":"",
+		"database":"mvc_example"
+	}
+}

@@ -1,0 +1,10 @@
+{
+    "dev": {
+	    "host": "localhost",
+	    "user": "root",
+	    "password" : "wurger12",
+	    "database": "sc_crud_mysql",
+	    "driver": "mysql",
+	    "multipleStatements": true
+  	}
+}
