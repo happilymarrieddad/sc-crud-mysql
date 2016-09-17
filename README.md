@@ -131,6 +131,8 @@ Write client-side models to handle complex operations =). So much win!
 
 All options
 
+Encryption is handled with bcrypt if no function is passed in. That is the preferred method but feel free to pass in your own function if you wish. 
+
 ```js
 scCrudMysql.attach(worker,{
 	encryptPasswords:true, // (Defaults to true) Ecrypt anything passed into the system with the name password (case insensitive)
