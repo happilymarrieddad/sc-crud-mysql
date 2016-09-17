@@ -1,0 +1,8 @@
+{
+	"db":{
+		"host":"localhost",
+		"user":"",
+		"password":"",
+		"database":"sc_crud_mysql"
+	}
+}

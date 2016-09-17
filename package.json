@@ -1,0 +1,36 @@
+{
+  "name": "sc-crud-mysql",
+  "version": "0.0.1",
+  "description": "Realtime CRUD data management layer/plugin for SocketCluster using MySQL as the database",
+  "main": "index.js",
+  "bugs": {
+    "url": "https://github.com/happilymarrieddad/sc-crud-mysql/issues"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/happilymarrieddad/sc-crud-mysql.git"
+  },
+  "keywords": [
+    "mysql",
+    "socketcluster",
+    "realtime",
+    "storage",
+    "rest",
+    "crud"
+  ],
+  "author": "Nick Kotenberg",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/happilymarrieddad/sc-crud-mysql/issues"
+  },
+  "homepage": "https://github.com/happilymarrieddad/sc-crud-mysql#readme",
+  "dependencies": {
+    "async": "^2.0.1",
+    "lodash": "^4.15.0",
+    "mysql": "^2.11.1",
+    "mysql-cache": "^0.5.5-b"
+  }
+}
