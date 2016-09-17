@@ -36,6 +36,9 @@ var SCCRUDMysql = function(options) {
 	if (options.encryption && typeof encryption == 'function') {
 		this._encrypt = options.encryption
 	} 
+	if (options.verifyEncryption && typeof verifyEncryption == 'function') {
+		this._verifyEncryption = options.verifyEncryption
+	} 
 
 	this._init(options)
 }

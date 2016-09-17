@@ -3,6 +3,9 @@
 
 ## Changelog
 
+- 0.1.1
+  - Added the ability to setup ecryption verification as well.
+
 - 0.1.0
   - Finished intial build. Let me know what you think!
   - I've added encryption. Check out the options below for more details.
@@ -131,12 +134,13 @@ Write client-side models to handle complex operations =). So much win!
 
 All options
 
-Encryption is handled with bcrypt if no function is passed in. That is the preferred method but feel free to pass in your own function if you wish. 
+Encryption is handled with bcrypt if no function is passed in. That is the preferred method but feel free to pass in your own function if you wish.
 
 ```js
 scCrudMysql.attach(worker,{
 	encryptPasswords:true, // (Defaults to true) Ecrypt anything passed into the system with the name password (case insensitive)
-	encryption:function(val) { return (val * 2) } // Defaults to bcrypt
+	encryption:function(val) { return (val * 2) }, // Defaults to bcrypt
+	verifyEncryption:function(val,hash) { return (val * 2) == hash } // Defaults to bcrypt
 })
 ```
 
