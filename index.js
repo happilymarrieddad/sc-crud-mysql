@@ -383,6 +383,12 @@ SCCRUDMysql.prototype.delete = function(qry,cb,socket) {
 	pool.query(query,values,cb)
 }
 
+SCCRUDMysql.prototype.query = function(qry,values,cb) {
+	var self = this
+	var pool = this._pool
+	pool.query(qry,values,cb)
+}
+
 
 /*
 	Name - _attachSocket

@@ -3,6 +3,9 @@
 
 ## Changelog
 
+- 0.2.0
+  - Added the ability to query server-side.
+
 - 0.1.1
   - Added the ability to setup ecryption verification as well.
 
@@ -199,6 +202,16 @@ scCrudMysql.attach(worker,{
 	})
 })
 
+```
+
+## Querying server-side
+
+You can query server-side if you need to. You use this just like the mysql module (pool)
+
+```js
+scCrudMysql.query('SELECT * FROM ??',['users'],function(err,users) {
+	console.log(users)
+})
 ```
 
 ## License
