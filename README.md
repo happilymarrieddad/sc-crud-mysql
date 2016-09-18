@@ -3,6 +3,9 @@
 
 ## Changelog
 
+- 0.3.0
+  - Allow for broadcasting back to clients.
+
 - 0.2.3
   - Fixed the error with CREATE.
 
@@ -77,7 +80,9 @@ socket.emit('create',{
 		first:'Nick',
 		last:'Kotenberg',
 		email:'happilymarrieddad@gmail.com'
-	}
+	},
+	unique:true,
+	unique_by:'email'
 },function(err,new_user) {
 	console.log(new_user)
 })
@@ -136,6 +141,18 @@ socket.emit('delete',{
 	console.log(new_user)
 })
 
+// If broadcasting back to all clients (defaults to true)
+// the syntax is 'table' + '-' + crud_operation
+socket.on('users-create',function(new_user) {
+	// Do something now that we know a user has been created by someone else
+})
+socket.on('users-update',function(new_user) {
+	// Do something now that we know a user has been updated by someone else
+})
+socket.on('users-delete',function(new_user) {
+	// Do something now that we know a user has been deleted by someone else
+})
+
 
 ```
 
@@ -149,6 +166,7 @@ Encryption is handled with bcrypt if no function is passed in. That is the prefe
 
 ```js
 scCrudMysql.attach(worker,{
+	dontBroadcast:false, (Defaults to false) Whether or not crud should be broadcasted back to all clients 
 	encryptPasswords:true, // (Defaults to true) Ecrypt anything passed into the system with the name password (case insensitive)
 	encryption:function(val) { return (val * 2) }, // Defaults to bcrypt
 	verifyEncryption:function(val,hash) { return (val * 2) == hash } // Defaults to bcrypt
