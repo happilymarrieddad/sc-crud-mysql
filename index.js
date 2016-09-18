@@ -96,18 +96,12 @@ SCCRUDMysql.prototype._init_pool = function(options) {
 
 		this._pool = mysql.createPool(this.db_config)
 	}
- 	this._init_schema(options)
-}
-
-SCCRUDMysql.prototype._init_schema = function(options) {
-
 }
 
 SCCRUDMysql.prototype._init_worker = function(options,worker) {
 	var self = this
 	this.scServer = worker.scServer || {}
 	this.brokerEngine = this.scServer.brokerEngine || {}
-	this._init_cache()
 
 	if (this.scServer && this.scServer.exchange) {
 		this.filter = new Filter(this.scServer)
@@ -115,32 +109,15 @@ SCCRUDMysql.prototype._init_worker = function(options,worker) {
 
 		// Here we are going to update the cache when publish is made
 		this.scServer.exchange.publish = function(channel,data,callback) {
-			// Check to see if crud is at the begining of the message
-			if (channel && channel.indexOf && channel.indexOf('crud>') == 0) {
-				console.log('')
-				console.log(channel)
-				console.log(data)
-				console.log('')
-				if (data == null) {
-					// Clear cache
-				} else {
-					// Update cache
-				}
-			}
 			self.publish.apply(self.scServer.exchange,arguments)
 		}
 
 		this.scServer.on('_handshake',function(socket) {
-			console.log('Initiate handshake')
 			self._attachSocket(socket)
 		})
 	} else {
 		this.publish = function(){}
 	}
-}
-
-SCCRUDMysql.prototype._init_cache = function(respond) {
-
 }
 
 SCCRUDMysql.prototype._encrypt = function(val) {
