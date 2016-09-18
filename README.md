@@ -3,6 +3,9 @@
 
 ## Changelog
 
+- 0.2.3
+  - Fixed the error with CREATE.
+
 - 0.2.2
   - Added limit and offset to READ.
 

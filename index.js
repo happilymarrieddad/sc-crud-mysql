@@ -229,6 +229,7 @@ SCCRUDMysql.prototype.create = function(qry,cb,socket) {
 	}
 
 	pool.query('INSERT INTO ?? SET ?',[qry.table,qry.post],function(err,rows) {
+		if (err) { return cb(err) }
 		self.first(rows.insertId,qry.unique_by || 'id',qry.table,function(err2,obj) {
 			if (err2) { return cb(err2) }
 			return cb(null,obj)
