@@ -3,7 +3,7 @@
 
 ## Changelog
 
-- 0.2.0
+- 0.2.1
   - Added the ability to query server-side.
 
 - 0.1.1
@@ -209,7 +209,11 @@ scCrudMysql.attach(worker,{
 You can query server-side if you need to. You use this just like the mysql module (pool)
 
 ```js
-scCrudMysql.query('SELECT * FROM ??',['users'],function(err,users) {
+var sc_crud_mysql = scCrudMysql.attach(worker,{
+    db:config.db
+})
+
+sc_crud_mysql.query('SELECT * FROM ??',['users'],function(err,users) {
 	console.log(users)
 })
 ```
