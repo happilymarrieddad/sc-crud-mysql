@@ -33,14 +33,12 @@ var SCCRUDMysql = function(options) {
 	this.worker = options.worker || {}
 	this.cacheEnabled = options.cacheEnabled || false
 	this.encryptPasswords = options.encryptPasswords || true
+	this._broadcastCRUD = !options.dontBroadcast
 	if (options.encryption && typeof encryption == 'function') {
 		this._encrypt = options.encryption
 	} 
 	if (options.verifyEncryption && typeof verifyEncryption == 'function') {
 		this._verifyEncryption = options.verifyEncryption
-	}
-	if (options.dontBroadcast) {
-		this._broadcastCRUD = options.dontBroadcast ? 0 : 1
 	}
 
 	this._init(options)
@@ -236,7 +234,10 @@ SCCRUDMysql.prototype.create = function(qry,cb,socket) {
 		self.first(rows.insertId,qry.unique_by || 'id',qry.table,function(err2,obj) {
 			if (err2) { return cb(err2) }
 			if (self._broadcastCRUD) {
-				self.worker.exchange.publish(qry.table+'-create',obj)
+				socket.global.publish('crud>create',{
+					table:qry.table,
+					post:obj
+				})
 			}
 			return cb(null,obj)
 		})
@@ -362,14 +363,14 @@ SCCRUDMysql.prototype.update = function(qry,cb,socket) {
 		}
 
 		if (self._broadcastCRUD) {
-			self.worker.exchange.publish(qry.table+'-create',obj)
+			socket.global.publish(qry.table+'-create',obj)
 		}
 		pool.query(query,values,function(err,rows) {
 			if (err) { return cb(err) }
 			self.read(qry,function(err2,rows2){
 				if (err2) { return cb(err2) }
 				if (self._broadcastCRUD) {
-					self.worker.exchange.publish(qry.table+'-update',rows2)
+					socket.global.publish(qry.table+'-update',rows2)
 				}
 				return cb(null,rows2)
 			},socket)
@@ -413,7 +414,7 @@ SCCRUDMysql.prototype.delete = function(qry,cb,socket) {
 		self.read(qry,function(err2,rows2){
 			if (err2) { return cb(err2) }
 			if (self._broadcastCRUD) {
-				self.worker.exchange.publish(qry.table+'-delete',rows2)
+				socket.global.publish(qry.table+'-delete',rows2)
 			}
 			return cb(null,rows2)
 		},socket)

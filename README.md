@@ -3,6 +3,9 @@
 
 ## Changelog
 
+- 0.3.1
+  - Fixed the documentation.
+
 - 0.3.0
   - Allow for broadcasting back to clients.
 
@@ -81,8 +84,8 @@ socket.emit('create',{
 		last:'Kotenberg',
 		email:'happilymarrieddad@gmail.com'
 	},
-	unique:true,
-	unique_by:'email'
+	unique:true, // Whether or not the resource should be unique when being created
+	unique_by:'id' // This is the unique primary key it will search for when grabbing the data after it has created a new resource
 },function(err,new_user) {
 	console.log(new_user)
 })
@@ -142,15 +145,27 @@ socket.emit('delete',{
 })
 
 // If broadcasting back to all clients (defaults to true)
-// the syntax is 'table' + '-' + crud_operation
-socket.on('users-create',function(new_user) {
-	// Do something now that we know a user has been created by someone else
+var createWatcher = socket.subscribe('crud>create')
+createWatcher.watch(function(data) {
+	/*  Example
+		{
+			table:'users',
+			post:{
+				id:1,
+				name:"Hugh Now",
+				email:"hugh@mail.com"
+			}
+		}
+	*/
+	console.log(data)
 })
-socket.on('users-update',function(new_user) {
-	// Do something now that we know a user has been updated by someone else
+var updateWatcher = socket.subscribe('crud>update')
+updateWatcher.watch(function(data) {
+	console.log(data)
 })
-socket.on('users-delete',function(new_user) {
-	// Do something now that we know a user has been deleted by someone else
+var deleteWatcher = socket.subscribe('crud>delete')
+deleteWatcher.watch(function(data) {
+	console.log(data)
 })
 
 
