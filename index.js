@@ -267,6 +267,15 @@ SCCRUDMysql.prototype.read = function(qry,cb,socket) {
 			}
 		})
 	}
+
+	if (qry.limit) {
+		query += ' LIMIT ' + limit
+	}
+
+	if (qry.offset) {
+		query += ' OFFSET ' + offset
+	}
+
 	pool.query(query,values,cb)
 }
 

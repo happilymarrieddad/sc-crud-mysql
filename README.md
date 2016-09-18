@@ -3,6 +3,9 @@
 
 ## Changelog
 
+- 0.2.2
+  - Added limit and offset to READ.
+
 - 0.2.1
   - Added the ability to query server-side.
 
@@ -109,7 +112,9 @@ socket.emit('read',{
 			operator:'>',
 			value:3}
 		}
-	]
+	],
+	limit:5,
+	offset:5
 },function(err,users) {
 	console.log(users)
 })
