@@ -254,11 +254,11 @@ SCCRUDMysql.prototype.read = function(qry,cb,socket) {
 	}
 
 	if (qry.limit) {
-		query += ' LIMIT ' + limit
+		query += ' LIMIT ' + qry.limit
 	}
 
 	if (qry.offset) {
-		query += ' OFFSET ' + offset
+		query += ' OFFSET ' + qry.offset
 	}
 
 	pool.query(query,values,cb)
