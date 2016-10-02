@@ -3,6 +3,9 @@
 
 ## Changelog
 
+- 0.4.0
+  - Added expressions and joins to 'read'.
+
 - 0.3.2
   - Fixed the documentation.
 
@@ -95,6 +98,7 @@ socket.emit('update',{
 	put:{
 		last:'Kotenberg 2'
 	},
+	// Optional
 	conditionals:[
 		{
 			field:'id',
@@ -115,13 +119,40 @@ socket.emit('update',{
 	if (err) { console.log(err) }
 })
 
+
+// If all you pass in is a table then you get 'SELECT * FROM ${table}'
 socket.emit('read',{
+	// Optional (you can pass in 'exp' or 'selects' if you don't like to type out 'expressions')
+	expressions:[  // Defaults to ['*']
+		'user_types.name as type_name',
+		'users.*'
+	],
 	table:'users',
+	// Optional
+	joins:[
+		{
+			table:'user_types',
+			conditionals:[
+				{
+					condition:'ON', // Defaults the first to 'ON' and every one after that defaults to 'AND'
+					field:'user_types.id',
+					operator:'=', // Defaults to '='
+					value:'users.type_id'
+				},
+				{
+					field:'user_types.id',
+					operator:'>', // Defaults to '='
+					value:'4'
+				}
+			]
+		}
+	],
+	// Optional
 	conditionals:[
 		{
 			field:'id',
-			operator:'>',
-			value:3}
+			operator:'>', // Defaults to '='
+			value:3
 		}
 	],
 	limit:5,
@@ -133,6 +164,7 @@ socket.emit('read',{
 socket.emit('delete',{
 	table:'users',
 	delete_from:'users,user_types', // (Optional) - assumes the table if not passed in
+	// Optional
 	conditionals:[
 		{
 			field:'id',

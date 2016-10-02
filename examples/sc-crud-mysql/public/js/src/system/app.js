@@ -1,5 +1,8 @@
 Vue.use(VueRouter)
-Vue.use(VueSocketcluster)
+Vue.use(VueSocketcluster,{
+	hostname:'localhost',
+	port:'3000'
+})
 
 router.map({
 	'/dashboard' : { component:dashboardComponent, auth:true },

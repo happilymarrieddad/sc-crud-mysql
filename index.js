@@ -139,49 +139,49 @@ SCCRUDMysql.prototype._isObjectEmpty = function(obj) {
 }
 
 
-SCCRUDMysql.prototype.unique = function(qry,cb,socket) {
+SCCRUDMysql.prototype.unique = function(qry,respond,socket) {
 	var self = this
 	var pool = this._pool
 	self.find(qry.id,qry.unique_by || 'id',qry.table,function(err,objs) {
-		if (err) { return cb(err) }
-		if (objs && objs.length) { return cb('Unable to create. Already exists.') }
+		if (err) { return respond(err) }
+		if (objs && objs.length) { return respond('Unable to create. Already exists.') }
 		delete qry.unique
-		self.create(qry,cb,socket)
+		self.create(qry,respond,socket)
 	})
 }
 
-SCCRUDMysql.prototype.first = function(id,primary_key,table,cb) {
+SCCRUDMysql.prototype.first = function(id,primary_key,table,respond) {
 	var self = this
 	var pool = this._pool
 	if (!primary_key) { primary_key = 'id' }
 	pool.query('SELECT * FROM ?? WHERE ?? = ?',[table,primary_key,id],function(err,rows) {
-		if (err) { return cb(err) }
-		if (!rows.length) { return cb(null,{}) }
-		return cb(null,rows[0])
+		if (err) { return respond(err) }
+		if (!rows.length) { return respond(null,{}) }
+		return respond(null,rows[0])
 	})
 }
 
-SCCRUDMysql.prototype.find = function(id,primary_key,table,cb) {
+SCCRUDMysql.prototype.find = function(id,primary_key,table,respond) {
 	var self = this
 	var pool = this._pool
 	if (!primary_key) { primary_key = 'id' }
 	pool.query(`SELECT * FROM ?? WHERE ?? = ?`,[table,primary_key,id],function(err,rows) {
-		if (err) { return cb(err) }
-		if (!rows.length) { return cb(null,{}) }
-		return cb(null,rows)
+		if (err) { return respond(err) }
+		if (!rows.length) { return respond(null,{}) }
+		return respond(null,rows)
 	})
 }
 
-SCCRUDMysql.prototype.fields = function(table,cb) {
+SCCRUDMysql.prototype.fields = function(table,respond) {
 	var self = this
 	var pool = this._pool
 	pool.query('DESCRIBE ??',[table],function(err,rows) {
-		if (err) { return cb(err) }
+		if (err) { return respond(err) }
 		var fields = []
 		rows.forEach(function(field,index){
 			fields.push(field.Field)
 		})
-		return cb(null,fields)
+		return respond(null,fields)
 	})
 }
 
@@ -193,10 +193,10 @@ SCCRUDMysql.prototype.fields = function(table,cb) {
 
 TODO: Need to add checks to make sure the table can accept the parameters passed in
 */
-SCCRUDMysql.prototype.create = function(qry,cb,socket) {
+SCCRUDMysql.prototype.create = function(qry,respond,socket) {
 	var self = this
 	var pool = this._pool
-	if (qry.unique) { return self.unique(qry,cb,socket) }
+	if (qry.unique) { return self.unique(qry,respond,socket) }
 
 	if (this.encryptPasswords) {
 		for (var key in qry.post) {
@@ -207,31 +207,73 @@ SCCRUDMysql.prototype.create = function(qry,cb,socket) {
 	}
 
 	pool.query('INSERT INTO ?? SET ?',[qry.table,qry.post],function(err,rows) {
-		if (err) { return cb(err) }
+		if (err) { return respond(err) }
 		self.first(rows.insertId,qry.unique_by || 'id',qry.table,function(err2,obj) {
-			if (err2) { return cb(err2) }
+			if (err2) { return respond(err2) }
 			if (self._broadcastCRUD) {
 				socket.global.publish('crud>create',{
 					table:qry.table,
 					post:obj
 				})
 			}
-			return cb(null,obj)
+			return respond(null,obj)
 		})
 	})
 }
 
-SCCRUDMysql.prototype.read = function(qry,cb,socket) {
+SCCRUDMysql.prototype.read = function(qry,respond,socket) {
 	var self = this
 	var pool = this._pool
-	var query = 'SELECT * FROM ?? '
+	var query = 'SELECT '
 	var values = [qry.table]
+
+	// TODO
+	if (qry.expressions || qry.exp || qry.selects) {
+		var expressions = qry.expressions || qry.exp || qry.selects
+		values.push(expressions)
+		query += '?? '
+	} else {
+		query += '* '
+	}
+
+	query += ' FROM ?? '
+
+	if (qry.joins) {
+		qry.joins.forEach(function(join,index) {
+			if (typeof join != 'object') { return respond('Query joins must be an array of objects. Please refer to the documentation.') }
+			if (!join.table) { return console.log('Join for',qry.table,'is invalid and being ignored') }
+			if (!join.type) { join.type = 'LEFT JOIN' }
+			query += ' ' + join.type + ' ' + join.table
+			if (join.conditionals) {
+				join.conditionals.forEach(function(conditional,index) {
+					if (typeof conditional != 'object') { return respond('Query conditionals must be an array of objects. Please refer to the documentation.') }
+					if (!conditional.custom && (!conditional.field || !conditional.value)) {
+						return console.log('Conditional for',qry.table,'read is invalid and being ignored.')
+					} // We ignore this object because it has no field
+					if (conditional.custom) {
+						query += ' ' + conditional.custom + ' '
+					} else {
+						if (index < 1) { query += 'ON ' }
+						else {
+							var condition = conditional.condition || 'AND'
+							query += condition + ' '
+						}
+						var field = conditional.field
+						var operator = conditional.operator || '='
+						var value = conditional.value || 'NULL'
+						query += field + ' ' + operator + ' ?'
+						values.push(value)
+					}
+				})
+			}
+		})
+	}
 
 	if (qry.conditionals) {
 		qry.conditionals.forEach(function(conditional,index) {
-			if (typeof conditional != 'object') { return cb('Query conditionals must be an array of objects. Please refer to the documentation.') }
+			if (typeof conditional != 'object') { return respond('Query conditionals must be an array of objects. Please refer to the documentation.') }
 			if (!conditional.custom && (!conditional.field || !conditional.value)) {
-				return console.log('conditional for',qry.table,'read is invalid and being ignored.')
+				return console.log('Conditional for',qry.table,'read is invalid and being ignored.')
 			} // We ignore this object because it has no field
 			if (conditional.custom) {
 				query += ' ' + conditional.custom + ' '
@@ -261,7 +303,7 @@ SCCRUDMysql.prototype.read = function(qry,cb,socket) {
 		query += ' OFFSET ' + qry.offset
 	}
 
-	pool.query(query,values,cb)
+	pool.query(query,values,respond)
 }
 
 
@@ -280,11 +322,11 @@ SCCRUDMysql.prototype.read = function(qry,cb,socket) {
 				custom:'AND type_id IN (1,4,5)'
 			}
 */
-SCCRUDMysql.prototype.update = function(qry,cb,socket) {
+SCCRUDMysql.prototype.update = function(qry,respond,socket) {
 	var self = this
 	var pool = this._pool
 	self.fields(qry.table,function(err,fields) {
-		if (err) { return cb(err) }
+		if (err) { return respond(err) }
 		var new_obj = {}
 		var put = qry.put || {}
 
@@ -315,7 +357,7 @@ SCCRUDMysql.prototype.update = function(qry,cb,socket) {
 
 		if (qry.conditionals) {
 			qry.conditionals.forEach(function(conditional,index) {
-				if (typeof conditional != 'object') { return cb('Query conditionals must be an array of objects. Please refer to the documentation.') }
+				if (typeof conditional != 'object') { return respond('Query conditionals must be an array of objects. Please refer to the documentation.') }
 				if (!conditional.custom && (!conditional.field || !conditional.value)) {
 					return console.log('conditional for',qry.table,'update is invalid and being ignored.')
 				} // We ignore this object because it has no field
@@ -343,19 +385,19 @@ SCCRUDMysql.prototype.update = function(qry,cb,socket) {
 			socket.global.publish(qry.table+'-create',obj)
 		}
 		pool.query(query,values,function(err,rows) {
-			if (err) { return cb(err) }
+			if (err) { return respond(err) }
 			self.read(qry,function(err2,rows2){
-				if (err2) { return cb(err2) }
+				if (err2) { return respond(err2) }
 				if (self._broadcastCRUD) {
 					socket.global.publish(qry.table+'-update',rows2)
 				}
-				return cb(null,rows2)
+				return respond(null,rows2)
 			},socket)
 		})
 	})
 }
 
-SCCRUDMysql.prototype.delete = function(qry,cb,socket) {
+SCCRUDMysql.prototype.delete = function(qry,respond,socket) {
 	var self = this
 	var pool = this._pool
 	var query = 'DELETE ' + (qry.delete_from || '') + ' FROM ?? '
@@ -363,7 +405,7 @@ SCCRUDMysql.prototype.delete = function(qry,cb,socket) {
 
 	if (qry.conditionals) {
 		qry.conditionals.forEach(function(conditional,index) {
-			if (typeof conditional != 'object') { return cb('Query conditionals must be an array of objects. Please refer to the documentation.') }
+			if (typeof conditional != 'object') { return respond('Query conditionals must be an array of objects. Please refer to the documentation.') }
 			if (!conditional.custom && (!conditional.field || !conditional.value)) {
 				return console.log('conditional for',qry.table,'delete is invalid and being ignored.')
 			} // We ignore this object because it has no field
@@ -387,21 +429,21 @@ SCCRUDMysql.prototype.delete = function(qry,cb,socket) {
 		})
 	}
 	pool.query(query,values,function(err,rows) {
-		if (err) { return cb(err) }
+		if (err) { return respond(err) }
 		self.read(qry,function(err2,rows2){
-			if (err2) { return cb(err2) }
+			if (err2) { return respond(err2) }
 			if (self._broadcastCRUD) {
 				socket.global.publish(qry.table+'-delete',rows2)
 			}
-			return cb(null,rows2)
+			return respond(null,rows2)
 		},socket)
 	})
 }
 
-SCCRUDMysql.prototype.query = function(qry,values,cb) {
+SCCRUDMysql.prototype.query = function(qry,values,respond) {
 	var self = this
 	var pool = this._pool
-	pool.query(qry,values,cb)
+	pool.query(qry,values,respond)
 }
 
 
