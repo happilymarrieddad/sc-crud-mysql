@@ -230,8 +230,10 @@ SCCRUDMysql.prototype.read = function(qry,respond,socket) {
 	// TODO
 	if (qry.expressions || qry.exp || qry.selects) {
 		var expressions = qry.expressions || qry.exp || qry.selects
-		values.push(expressions)
-		query += ' ?? '
+		expressions.forEach(function(exp,index) {
+			query += ' ' + exp + ','
+		})
+		query = query.slice(0,-1) + ' '
 	} else {
 		query += ' * '
 	}
@@ -262,8 +264,7 @@ SCCRUDMysql.prototype.read = function(qry,respond,socket) {
 						var field = conditional.field
 						var operator = conditional.operator || '='
 						var value = conditional.value || 'NULL'
-						query += field + ' ' + operator + ' ? '
-						values.push(value)
+						query += field + ' ' + operator + ' ' + value + ' '
 					}
 				})
 			}
