@@ -231,9 +231,9 @@ SCCRUDMysql.prototype.read = function(qry,respond,socket) {
 	if (qry.expressions || qry.exp || qry.selects) {
 		var expressions = qry.expressions || qry.exp || qry.selects
 		values.push(expressions)
-		query += '?? '
+		query += ' ?? '
 	} else {
-		query += '* '
+		query += ' * '
 	}
 
 	query += ' FROM ?? '
@@ -254,15 +254,15 @@ SCCRUDMysql.prototype.read = function(qry,respond,socket) {
 					if (conditional.custom) {
 						query += ' ' + conditional.custom + ' '
 					} else {
-						if (index < 1) { query += 'ON ' }
+						if (index < 1) { query += ' ON ' }
 						else {
 							var condition = conditional.condition || 'AND'
-							query += condition + ' '
+							query += ' ' + condition + ' '
 						}
 						var field = conditional.field
 						var operator = conditional.operator || '='
 						var value = conditional.value || 'NULL'
-						query += field + ' ' + operator + ' ?'
+						query += field + ' ' + operator + ' ? '
 						values.push(value)
 					}
 				})
