@@ -1,6 +1,6 @@
 {
   "name": "sc-crud-mysql",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "description": "Realtime CRUD data management layer/plugin for SocketCluster using MySQL as the database",
   "main": "index.js",
   "bugs": {
