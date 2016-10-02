@@ -225,7 +225,7 @@ SCCRUDMysql.prototype.read = function(qry,respond,socket) {
 	var self = this
 	var pool = this._pool
 	var query = 'SELECT '
-	var values = [qry.table]
+	var values = []
 
 	// TODO
 	if (qry.expressions || qry.exp || qry.selects) {
@@ -237,6 +237,7 @@ SCCRUDMysql.prototype.read = function(qry,respond,socket) {
 	}
 
 	query += ' FROM ?? '
+	values.push(qry.table)
 
 	if (qry.joins) {
 		qry.joins.forEach(function(join,index) {
