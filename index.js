@@ -305,7 +305,10 @@ SCCRUDMysql.prototype.read = function(qry,respond,socket) {
 		query += ' OFFSET ' + qry.offset
 	}
 
-	pool.query(query,values,respond)
+	pool.query(query,values,function(err,rows) {
+		if (err) { return respond(err + '. QUERY - ' + query) }
+		return respond(null,rows)
+	})
 }
 
 
@@ -383,15 +386,15 @@ SCCRUDMysql.prototype.update = function(qry,respond,socket) {
 			})
 		}
 
-		if (self._broadcastCRUD) {
-			socket.global.publish(qry.table+'-create',obj)
-		}
 		pool.query(query,values,function(err,rows) {
 			if (err) { return respond(err) }
 			self.read(qry,function(err2,rows2){
 				if (err2) { return respond(err2) }
 				if (self._broadcastCRUD) {
-					socket.global.publish(qry.table+'-update',rows2)
+					socket.global.publish('crud>update',{
+						table:qry.table,
+						puts:rows2
+					})
 				}
 				return respond(null,rows2)
 			},socket)
@@ -435,7 +438,10 @@ SCCRUDMysql.prototype.delete = function(qry,respond,socket) {
 		self.read(qry,function(err2,rows2){
 			if (err2) { return respond(err2) }
 			if (self._broadcastCRUD) {
-				socket.global.publish(qry.table+'-delete',rows2)
+				socket.global.publish('crud>delete',{
+					table:qry.table,
+					deletes:rows2
+				})
 			}
 			return respond(null,rows2)
 		},socket)

@@ -141,7 +141,7 @@ socket.emit('read',{
 				},
 				{
 					field:'user_types.id',
-					operator:'>', // Defaults to '='
+					operator:'>',
 					value:'4'
 				}
 			]
@@ -193,11 +193,13 @@ createWatcher.watch(function(data) {
 })
 var updateWatcher = socket.subscribe('crud>update')
 updateWatcher.watch(function(data) {
-	console.log(data)
+	console.log(data.table)
+	console.log(data.puts) // All the rows that were updated
 })
 var deleteWatcher = socket.subscribe('crud>delete')
 deleteWatcher.watch(function(data) {
-	console.log(data)
+	console.log(data.table)
+	console.log(data.deletes) // All the rows that were deleted
 })
 
 
