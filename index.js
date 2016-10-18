@@ -251,14 +251,15 @@ SCCRUDMysql.prototype.read = function(qry,respond,socket) {
 				join.conditionals.forEach(function(conditional,index) {
 					if (typeof conditional != 'object') { return respond('Query conditionals must be an array of objects. Please refer to the documentation.') }
 					if (!conditional.custom && (!conditional.field || !conditional.value)) {
-						return console.log('Conditional for',qry.table,'read is invalid and being ignored.')
+						console.log(conditional)
+						return console.log('Conditional for',qry.table,'read join is invalid and being ignored.')
 					} // We ignore this object because it has no field
 					if (conditional.custom) {
 						query += ' ' + conditional.custom + ' '
 					} else {
 						if (index < 1) { query += ' ON ' }
 						else {
-							var condition = conditional.condition || 'AND'
+							var condition = conditional.condition || ' AND'
 							query += ' ' + condition + ' '
 						}
 						var field = conditional.field
@@ -275,14 +276,15 @@ SCCRUDMysql.prototype.read = function(qry,respond,socket) {
 		qry.conditionals.forEach(function(conditional,index) {
 			if (typeof conditional != 'object') { return respond('Query conditionals must be an array of objects. Please refer to the documentation.') }
 			if (!conditional.custom && (!conditional.field || !conditional.value)) {
+				console.log(conditional)
 				return console.log('Conditional for',qry.table,'read is invalid and being ignored.')
 			} // We ignore this object because it has no field
 			if (conditional.custom) {
 				query += ' ' + conditional.custom + ' '
 			} else {
-				if (index < 1) { query += 'WHERE ' }
+				if (index < 1) { query += ' WHERE ' }
 				else {
-					var condition = 'AND'
+					var condition = ' AND'
 					if (conditional.condition) {
 						condition = conditional.condition
 					}
@@ -304,7 +306,7 @@ SCCRUDMysql.prototype.read = function(qry,respond,socket) {
 	if (qry.offset) {
 		query += ' OFFSET ' + qry.offset
 	}
-
+	
 	pool.query(query,values,function(err,rows) {
 		if (err) { return respond(err + '. QUERY - ' + query) }
 		return respond(null,rows)
