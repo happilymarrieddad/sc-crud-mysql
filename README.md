@@ -3,6 +3,9 @@
 
 ## Changelog
 
+- 0.4.1
+  - Added order_by for reads.
+
 - 0.4.0
   - Added expressions and joins to 'read'.
 
@@ -155,6 +158,7 @@ socket.emit('read',{
 			value:3
 		}
 	],
+	order_by:'users.last,users.first',
 	limit:5,
 	offset:5
 },function(err,users) {

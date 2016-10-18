@@ -299,6 +299,10 @@ SCCRUDMysql.prototype.read = function(qry,respond,socket) {
 		})
 	}
 
+	if (qry.order_by) {
+		query += ' ORDER BY ' + qry.order_by + ' '
+	}
+
 	if (qry.limit) {
 		query += ' LIMIT ' + qry.limit
 	}
