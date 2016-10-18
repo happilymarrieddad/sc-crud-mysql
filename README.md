@@ -1,9 +1,8 @@
-# This is an alpha build. It probably shouldn't be used in production quite yet.
-### I could really use some strong testing if anyone has the time. Thanks!
+# SC-CRUD-MYSQL
 
 ## Changelog
 
-- 0.4.1
+- 0.4.7
   - Added order_by for reads.
 
 - 0.4.0
