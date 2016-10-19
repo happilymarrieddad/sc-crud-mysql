@@ -250,7 +250,7 @@ SCCRUDMysql.prototype.read = function(qry,respond,socket) {
 			if (join.conditionals) {
 				join.conditionals.forEach(function(conditional,index) {
 					if (typeof conditional != 'object') { return respond('Query conditionals must be an array of objects. Please refer to the documentation.') }
-					if (!conditional.custom && (!conditional.field || !conditional.value)) {
+					if (!conditional.custom && (!conditional.field)) {
 						console.log(conditional)
 						return console.log('Conditional for',qry.table,'read join is invalid and being ignored.')
 					} // We ignore this object because it has no field
@@ -275,7 +275,7 @@ SCCRUDMysql.prototype.read = function(qry,respond,socket) {
 	if (qry.conditionals) {
 		qry.conditionals.forEach(function(conditional,index) {
 			if (typeof conditional != 'object') { return respond('Query conditionals must be an array of objects. Please refer to the documentation.') }
-			if (!conditional.custom && (!conditional.field || !conditional.value)) {
+			if (!conditional.custom && (!conditional.field)) {
 				console.log(conditional)
 				return console.log('Conditional for',qry.table,'read is invalid and being ignored.')
 			} // We ignore this object because it has no field
