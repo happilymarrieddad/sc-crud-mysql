@@ -28,6 +28,8 @@ var SCCRUDMysql = function(options) {
 		trace:true,
 		multipleStatements:false
 	}
+	// THIS IS SOMEWHAT DANGEROUS!!
+	this.allowCustomQuery = options.allowCustomQuery || false
 	this.schema = options.schema || null
 	this.debug = options.debug || false
 	this.worker = options.worker || {}
@@ -198,6 +200,10 @@ SCCRUDMysql.prototype._attachSocket = function (socket) {
 			value:'Nick'
 		}
 	*/
+	socket.on('query', function (query, callback) {
+		if (!self.allowCustomQuery) { return callback('Custom queries not enabled. Please pass in the parameter on init.') }
+		self.query(query,callback,socket)
+	})
 
 	socket.on('create', function (query, callback) {
 		if (!query.table) { return callback('Table name is required to create a resource') }
@@ -226,9 +232,15 @@ SCCRUDMysql.prototype._attachSocket = function (socket) {
 		self.first(query.id,query.primary_key,query.table, callback)
 	})
 	socket.on('find', function (query, callback) {
-		if (!query.table) { return callback('Table name is required to get find row of a resource') }
+		if (!query.table) { return callback('Table name is required to find row of a resource') }
 		self.find(query.id,query.primary_key,query.table, callback)
 	})
+}
+
+
+SCCRUDMysql.prototype.query = function(qry,respond,socket) {
+	var self = this
+	pool.query(qry.qry,qry.values || [],respond)
 }
 
 /*

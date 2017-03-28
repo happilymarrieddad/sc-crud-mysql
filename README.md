@@ -2,6 +2,9 @@
 
 ## Changelog
 
+- 0.6.1
+  - Added query function
+
 - 0.6.0
   - Added 3 more functions
 
@@ -217,6 +220,14 @@ socket.emit('find',{
 	console.log(users)
 })
 
+// Grab the records in the database with a conditional (optional)
+socket.emit('query',{
+	qry:'SELECT * FROM users WHERE ?? = ?',
+	values:["email","user@mail.com"]
+},function(err,user) {
+	console.log(user)
+})
+
 // If broadcasting back to all clients (defaults to true)
 var createWatcher = socket.subscribe('crud>create')
 createWatcher.watch(function(data) {
@@ -259,7 +270,8 @@ scCrudMysql.attach(worker,{
 	dontBroadcast:false, (Defaults to false) Whether or not crud should be broadcasted back to all clients 
 	encryptPasswords:true, // (Defaults to true) Ecrypt anything passed into the system with the name password (case insensitive)
 	encryption:function(val) { return (val * 2) }, // Defaults to bcrypt
-	verifyEncryption:function(val,hash) { return (val * 2) == hash } // Defaults to bcrypt
+	verifyEncryption:function(val,hash) { return (val * 2) == hash }, // Defaults to bcrypt,
+	allowCustomQuery:true // Allow custom queries via 'query' channel
 })
 ```
 
