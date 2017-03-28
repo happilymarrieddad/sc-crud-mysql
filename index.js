@@ -76,12 +76,7 @@ SCCRUDMysql.prototype._init_pool = function(options) {
 		})
 		this._pool = cache
 	} else {
-		if (
-			!options.db ||
-			!options.db.user ||
-			!options.db.password ||
-			!options.db.database
-		) { throw new Error('SCCRUDMysql requires a db parameter with valid connection data in order to work.') }
+		if (!options.db) { throw new Error('SCCRUDMysql requires a db parameter with valid connection data in order to work.') }
 	 	
 	 	for (var key in this.db_config) {
 	 		if (this.db_config.hasOwnProperty(key)) {
@@ -211,10 +206,12 @@ SCCRUDMysql.prototype.create = function(qry,respond,socket) {
 		self.first(rows.insertId,qry.unique_by || 'id',qry.table,function(err2,obj) {
 			if (err2) { return respond(err2) }
 			if (self._broadcastCRUD) {
-				socket.global.publish('crud>create',{
-					table:qry.table,
-					post:obj
-				})
+				try {
+					self.publish('crud>create',{
+						table:qry.table,
+						post:obj
+					})
+				} catch(err3) {}
 			}
 			return respond(null,obj)
 		})
@@ -403,10 +400,12 @@ SCCRUDMysql.prototype.update = function(qry,respond,socket) {
 			self.read(qry,function(err2,rows2){
 				if (err2) { return respond(err2) }
 				if (self._broadcastCRUD) {
-					socket.global.publish('crud>update',{
-						table:qry.table,
-						puts:rows2
-					})
+					try {
+						self.publish('crud>update',{
+							table:qry.table,
+							puts:rows2
+						})
+					} catch(err3) {}
 				}
 				return respond(null,rows2)
 			},socket)
@@ -451,10 +450,12 @@ SCCRUDMysql.prototype.delete = function(qry,respond,socket) {
 		self.read(qry,function(err2,rows2){
 			if (err2) { return respond(err2) }
 			if (self._broadcastCRUD) {
-				socket.global.publish('crud>delete',{
-					table:qry.table,
-					deletes:rows2
-				})
+				try {
+					self.publish('crud>delete',{
+						table:qry.table,
+						deletes:rows2
+					})
+				} catch(err3) {}
 			}
 			return respond(null,rows2)
 		},socket)

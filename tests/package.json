@@ -1,0 +1,16 @@
+{
+  "name": "tests",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^2.2.0",
+    "mysql": "^2.13.0",
+    "sc-crud-mysql": "file:sc-crud-mysql-0.4.8.tgz"
+  }
+}
