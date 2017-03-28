@@ -230,10 +230,8 @@ SCCRUDMysql.prototype.read = function(qry,respond,socket) {
 	// TODO
 	if (qry.expressions || qry.exp || qry.selects) {
 		var expressions = qry.expressions || qry.exp || qry.selects
-		expressions.forEach(function(exp,index) {
-			query += ' ' + exp + ','
-		})
-		query = query.slice(0,-1) + ' '
+		query += ' ?? '
+		values.push(expressions)
 	} else {
 		query += ' * '
 	}
@@ -265,7 +263,9 @@ SCCRUDMysql.prototype.read = function(qry,respond,socket) {
 						var field = conditional.field
 						var operator = conditional.operator || '='
 						var value = conditional.value || 'NULL'
-						query += field + ' ' + operator + ' ' + value + ' '
+						values.push(field)
+						values.push(value)
+						query += ' ?? ' + operator + ' ? '
 					}
 				})
 			}
@@ -293,22 +293,26 @@ SCCRUDMysql.prototype.read = function(qry,respond,socket) {
 				var field = conditional.field
 				var operator = conditional.operator || '='
 				var value = conditional.value || 'NULL'
-				query += field + ' ' + operator + ' ?'
+				query += ' ?? ' + operator + ' ?'
+				values.push(field)
 				values.push(value)
 			}
 		})
 	}
 
 	if (qry.order_by) {
-		query += ' ORDER BY ' + qry.order_by + ' '
+		values.push(qry.order_by)
+		query += ' ORDER BY ?'
 	}
 
 	if (qry.limit) {
-		query += ' LIMIT ' + qry.limit
+		values.push(qry.limit)
+		query += ' LIMIT ?'
 	}
 
 	if (qry.offset) {
-		query += ' OFFSET ' + qry.offset
+		values.push(qry.offset)
+		query += ' OFFSET ?'
 	}
 	
 	pool.query(query,values,function(err,rows) {
@@ -359,7 +363,8 @@ SCCRUDMysql.prototype.update = function(qry,respond,socket) {
 		var set = 'SET '
 		for (var key in new_obj) {
 			if (new_obj.hasOwnProperty(key)) {
-				set += key + ' = ?,'
+				set += ' ?? = ?,'
+				values.push(key)
 				values.push(new_obj[key])
 			}
 		}
@@ -386,7 +391,8 @@ SCCRUDMysql.prototype.update = function(qry,respond,socket) {
 					var field = conditional.field
 					var operator = conditional.operator || '='
 					var value = conditional.value || 'NULL'
-					query += field + ' ' + operator + ' ?'
+					query += ' ?? ' + operator + ' ?'
+					values.push(field)
 					values.push(value)
 				}
 			})
@@ -434,7 +440,8 @@ SCCRUDMysql.prototype.delete = function(qry,respond,socket) {
 				var field = conditional.field
 				var operator = conditional.operator || '='
 				var value = conditional.value || 'NULL'
-				query += field + ' ' + operator + ' ?'
+				query += ' ?? ' + operator + ' ?'
+				values.push(field)
 				values.push(value)
 			}
 		})
