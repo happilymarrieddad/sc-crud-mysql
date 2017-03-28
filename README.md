@@ -2,6 +2,9 @@
 
 ## Changelog
 
+- 0.5.0
+  - Better SQL injection protection and tests added
+
 - 0.4.7
   - Added order_by for reads.
 
