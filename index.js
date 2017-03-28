@@ -180,6 +180,57 @@ SCCRUDMysql.prototype.fields = function(table,respond) {
 	})
 }
 
+
+/*
+	Name - _attachSocket
+	@summary - Here we attach the socket to basic crud
+				types. This function is also responsible
+				for validation for crud requests.
+*/
+SCCRUDMysql.prototype._attachSocket = function (socket) {
+	var self = this
+
+	/*
+		query : {
+			id:1,
+			type:'users',
+			field:'first',
+			value:'Nick'
+		}
+	*/
+
+	socket.on('create', function (query, callback) {
+		if (!query.table) { return callback('Table name is required to create a resource') }
+		else if (!query.post || typeof query.post != 'object') { return callback('A post object is required to create a resource') }
+		self.create(query, callback, socket)
+	})
+	socket.on('read', function (query, callback) {
+		if (!query.table) { return callback('Table name is required to read a resource') }
+		self.read(query, callback, socket)
+	})
+	socket.on('update', function (query, callback) {
+		if (!query.table) { return callback('Table name is required to update a resource') }
+		else if (!query.put || typeof query.put != 'object' || self._isObjectEmpty(query.put)) { return callback('A put object is required to create a resource') }
+		self.update(query, callback, socket)
+	})
+	socket.on('delete', function (query, callback) {
+		if (!query.table) { return callback('Table name is required to delete a resource') }
+		self.delete(query, callback, socket)
+	})
+	socket.on('unique', function (query, callback) {
+		if (!query.table) { return callback('Table name is required to get unique row of a resource') }
+		self.unique(query, callback, socket)
+	})
+	socket.on('first', function (query, callback) {
+		if (!query.table) { return callback('Table name is required to get first row of a resource') }
+		self.first(query.id,query.primary_key,query.table, callback)
+	})
+	socket.on('find', function (query, callback) {
+		if (!query.table) { return callback('Table name is required to get find row of a resource') }
+		self.find(query.id,query.primary_key,query.table, callback)
+	})
+}
+
 /*
 @params -
 	unique - bool - Whether the passed in object should be unique or not
@@ -466,48 +517,6 @@ SCCRUDMysql.prototype.query = function(qry,values,respond) {
 	var self = this
 	var pool = this._pool
 	pool.query(qry,values,respond)
-}
-
-
-/*
-	Name - _attachSocket
-	@summary - Here we attach the socket to basic crud
-				types. This function is also responsible
-				for validation for crud requests.
-*/
-SCCRUDMysql.prototype._attachSocket = function (socket) {
-	var self = this
-
-	/*
-		query : {
-			id:1,
-			type:'users',
-			field:'first',
-			value:'Nick'
-		}
-
-		TODO : Add validation for the query before it is
-			   sent to the DB.
-	*/
-
-	socket.on('create', function (query, callback) {
-		if (!query.table) { return callback('Table name is required to create a resource') }
-		else if (!query.post || typeof query.post != 'object') { return callback('A post object is required to create a resource') }
-		self.create(query, callback, socket)
-	})
-	socket.on('read', function (query, callback) {
-		if (!query.table) { return callback('Table name is required to read a resource') }
-		self.read(query, callback, socket)
-	})
-	socket.on('update', function (query, callback) {
-		if (!query.table) { return callback('Table name is required to update a resource') }
-		else if (!query.put || typeof query.put != 'object' || self._isObjectEmpty(query.put)) { return callback('A put object is required to create a resource') }
-		self.update(query, callback, socket)
-	})
-	socket.on('delete', function (query, callback) {
-		if (!query.table) { return callback('Table name is required to delete a resource') }
-		self.delete(query, callback, socket)
-	})
 }
 
 SCCRUDMysql.prototype.getPool = function() {

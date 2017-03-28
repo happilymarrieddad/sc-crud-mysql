@@ -2,6 +2,9 @@
 
 ## Changelog
 
+- 0.6.0
+  - Added 3 more functions
+
 - 0.5.0
   - Better SQL injection protection and tests added
 
@@ -180,6 +183,38 @@ socket.emit('delete',{
 	]
 },function(err,new_user) {
 	console.log(new_user)
+})
+
+// Create a record in the database that is unique (i.e. check to ensure it's going to be a unique record.)
+socket.emit('unique',{
+	table:'users',
+	id:'happilymarrieddad@gmail.com', 	// The value to check for
+	unique_by:'email', 					// The unique field to check
+	post:{
+		first:'Nick',
+		last:'Kotenberg',
+		email:'happilymarrieddad@gmail.com'
+	}
+},function(err,new_user) {
+	console.log(new_user)
+})
+
+// Grab the first record in the database with a conditional (optional)
+socket.emit('first',{
+	table:'users',
+	id:"happilymarrieddad@gmail.com",
+	primary_key:"email"
+},function(err,first_user) {
+	console.log(first_user)
+})
+
+// Grab the records in the database with a conditional (optional)
+socket.emit('find',{
+	table:'users',
+	id:"John",
+	primary_key:"first_name"
+},function(err,users) {
+	console.log(users)
 })
 
 // If broadcasting back to all clients (defaults to true)
