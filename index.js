@@ -324,8 +324,13 @@ SCCRUDMysql.prototype.read = function(qry,respond,socket) {
 						var operator = conditional.operator || '='
 						var value = conditional.value || 'NULL'
 						values.push(field)
-						values.push(value)
-						query += ' ?? ' + operator + ' ? '
+						query += ' ?? ' + operator
+						if (operator && operator.toLowerCase() == 'like') {
+							query += ' ' + mysql.escape("%" + value + "%")
+						} else {
+							values.push(value)
+							query += ' ? '
+						}
 					}
 				})
 			}
@@ -353,9 +358,14 @@ SCCRUDMysql.prototype.read = function(qry,respond,socket) {
 				var field = conditional.field
 				var operator = conditional.operator || '='
 				var value = conditional.value || 'NULL'
-				query += ' ?? ' + operator + ' ?'
 				values.push(field)
-				values.push(value)
+				query += ' ?? ' + operator
+				if (operator && operator.toLowerCase() == 'like') {
+					query += ' ' + mysql.escape("%" + value + "%")
+				} else {
+					values.push(value)
+					query += ' ? '
+				}
 			}
 		})
 	}
@@ -451,9 +461,14 @@ SCCRUDMysql.prototype.update = function(qry,respond,socket) {
 					var field = conditional.field
 					var operator = conditional.operator || '='
 					var value = conditional.value || 'NULL'
-					query += ' ?? ' + operator + ' ?'
 					values.push(field)
-					values.push(value)
+					query += ' ?? ' + operator
+					if (operator && operator.toLowerCase() == 'like') {
+						query += ' ' + mysql.escape("%" + value + "%")
+					} else {
+						values.push(value)
+						query += ' ? '
+					}
 				}
 			})
 		}
@@ -502,9 +517,14 @@ SCCRUDMysql.prototype.delete = function(qry,respond,socket) {
 				var field = conditional.field
 				var operator = conditional.operator || '='
 				var value = conditional.value || 'NULL'
-				query += ' ?? ' + operator + ' ?'
 				values.push(field)
-				values.push(value)
+				query += ' ?? ' + operator
+				if (operator && operator.toLowerCase() == 'like') {
+					query += ' ' + mysql.escape("%" + value + "%")
+				} else {
+					values.push(value)
+					query += ' ? '
+				}
 			}
 		})
 	}

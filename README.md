@@ -2,6 +2,9 @@
 
 ## Changelog
 
+- 0.6.2
+  - Added ability to use the LIKE operator
+
 - 0.6.1
   - Added query function
 

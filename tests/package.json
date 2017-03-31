@@ -6,14 +6,14 @@
   "scripts": {
     "test": "npm run build && node index.js",
     "build": "npm run createTar && npm run installPack",
-    "installPack": "npm install sc-crud-mysql-0.5.0.tgz --save",
-    "createTar": "cd .. && npm pack && mv sc-crud-mysql-0.5.0.tgz tests/sc-crud-mysql-0.5.0.tgz && cd tests"
+    "installPack": "npm install sc-crud-mysql-0.6.1.tgz --save",
+    "createTar": "cd .. && npm pack && mv sc-crud-mysql-0.6.1.tgz tests/sc-crud-mysql-0.6.1.tgz && cd tests"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "async": "^2.2.0",
     "mysql": "^2.13.0",
-    "sc-crud-mysql": "file:sc-crud-mysql-0.5.0.tgz"
+    "sc-crud-mysql": "file:sc-crud-mysql-0.6.1.tgz"
   }
 }
