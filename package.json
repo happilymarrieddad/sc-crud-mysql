@@ -1,6 +1,6 @@
 {
   "name": "sc-crud-mysql",
-  "version": "0.6.4",
+  "version": "0.6.5",
   "description": "Realtime CRUD data management layer/plugin for SocketCluster using MySQL as the database",
   "main": "index.js",
   "bugs": {
@@ -25,10 +25,10 @@
   "license": "MIT",
   "homepage": "https://github.com/happilymarrieddad/sc-crud-mysql#readme",
   "dependencies": {
-    "async": "^2.0.1",
+    "async": "^3.2.6",
     "bcrypt": "^6.0.0",
     "lodash": "^4.15.0",
     "mysql": "^2.11.1",
-    "mysql-cache": "^0.5.5-b"
+    "mysql-cache": "^2.1.2"
   }
 }
